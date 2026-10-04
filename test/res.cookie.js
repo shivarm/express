@@ -1,294 +1,524 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest')
   , cookieParser = require('cookie-parser')
 
 describe('res', function(){
   describe('.cookie(name, object)', function(){
-    it('should generate a JSON cookie', function(done){
-      var app = express();
+    it('should generate a JSON cookie', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.cookie('user', { name: 'tobi' }).end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.cookie('user', { name: 'tobi' }).end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'user=j%3A%7B%22name%22%3A%22tobi%22%7D; Path=/')
       .expect(200, done)
+
+
+      })
     })
   })
 
   describe('.cookie(name, string)', function(){
-    it('should set a cookie', function(done){
-      var app = express();
+    it('should set a cookie', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.cookie('name', 'tobi').end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.cookie('name', 'tobi').end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'name=tobi; Path=/')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should allow multiple calls', function(done){
-      var app = express();
+    it('should allow multiple calls', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.cookie('name', 'tobi');
-        res.cookie('age', 1);
-        res.cookie('gender', '?');
-        res.end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.cookie('name', 'tobi');
+          res.cookie('age', 1);
+          res.cookie('gender', '?');
+          res.end();
+        });
+
+        request(app)
         .get('/')
         .expect('Set-Cookie', 'name=tobi; Path=/,age=1; Path=/,gender=%3F; Path=/')
         .expect(200, done)
+
+
+      })
     })
   })
 
   describe('.cookie(name, string, options)', function(){
-    it('should set params', function(done){
-      var app = express();
+    it('should set params', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.cookie('name', 'tobi', { httpOnly: true, secure: true });
-        res.end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.cookie('name', 'tobi', { httpOnly: true, secure: true });
+          res.end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'name=tobi; Path=/; HttpOnly; Secure')
       .expect(200, done)
+
+
+      })
     })
 
     describe('expires', function () {
-      it('should throw on invalid date', function (done) {
-        var app = express()
+      it('should throw on invalid date', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { expires: new Date(NaN) })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { expires: new Date(NaN) })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect(500, /option expires is invalid/, done)
+
+
+        })
       })
     })
 
     describe('partitioned', function () {
-      it('should set partitioned', function (done) {
-        var app = express();
+      it('should set partitioned', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { partitioned: true });
-          res.end();
-        });
+          var app = express();
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { partitioned: true });
+            res.end();
+          });
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', 'name=tobi; Path=/; Partitioned')
           .expect(200, done)
+
+
+        })
       })
     })
 
     describe('maxAge', function(){
-      it('should set relative expires', function(done){
-        var app = express();
+      it('should set relative expires', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.cookie('name', 'tobi', { maxAge: 1000 });
-          res.end();
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('name', 'tobi', { maxAge: 1000 });
+            res.end();
+          });
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', /name=tobi; Max-Age=1; Path=\/; Expires=/)
           .expect(200, done)
+
+
+        })
       })
 
-      it('should set max-age', function(done){
-        var app = express();
+      it('should set max-age', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.cookie('name', 'tobi', { maxAge: 1000 });
-          res.end();
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('name', 'tobi', { maxAge: 1000 });
+            res.end();
+          });
+
+          request(app)
         .get('/')
         .expect('Set-Cookie', /Max-Age=1/, done)
+
+
+        })
       })
 
-      it('should not mutate the options object', function(done){
-        var app = express();
+      it('should not mutate the options object', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        var options = { maxAge: 1000 };
-        var optionsCopy = { ...options };
+          var app = express();
 
-        app.use(function(req, res){
-          res.cookie('name', 'tobi', options)
-          res.json(options)
-        });
+          var options = { maxAge: 1000 };
+          var optionsCopy = { ...options };
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('name', 'tobi', options)
+            res.json(options)
+          });
+
+          request(app)
         .get('/')
         .expect(200, optionsCopy, done)
+
+
+        })
       })
 
-      it('should not throw on null', function (done) {
-        var app = express()
+      it('should not throw on null', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { maxAge: null })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { maxAge: null })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect(200)
           .expect('Set-Cookie', 'name=tobi; Path=/')
           .end(done)
+
+
+        })
       })
 
-      it('should not throw on undefined', function (done) {
-        var app = express()
+      it('should not throw on undefined', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { maxAge: undefined })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { maxAge: undefined })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect(200)
           .expect('Set-Cookie', 'name=tobi; Path=/')
           .end(done)
+
+
+        })
       })
 
-      it('should throw an error with invalid maxAge', function (done) {
-        var app = express()
+      it('should throw an error with invalid maxAge', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { maxAge: 'foobar' })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { maxAge: 'foobar' })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect(500, /option maxAge is invalid/, done)
+
+
+        })
       })
     })
 
     describe('priority', function () {
-      it('should set low priority', function (done) {
-        var app = express()
+      it('should set low priority', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { priority: 'low' })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { priority: 'low' })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', /Priority=Low/)
           .expect(200, done)
+
+
+        })
       })
 
-      it('should set medium priority', function (done) {
-        var app = express()
+      it('should set medium priority', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { priority: 'medium' })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { priority: 'medium' })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', /Priority=Medium/)
           .expect(200, done)
+
+
+        })
       })
 
-      it('should set high priority', function (done) {
-        var app = express()
+      it('should set high priority', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { priority: 'high' })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { priority: 'high' })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', /Priority=High/)
           .expect(200, done)
+
+
+        })
       })
 
-      it('should throw with invalid priority', function (done) {
-        var app = express()
+      it('should throw with invalid priority', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function (req, res) {
-          res.cookie('name', 'tobi', { priority: 'foobar' })
-          res.end()
-        })
+          var app = express()
 
-        request(app)
+          app.use(function (req, res) {
+            res.cookie('name', 'tobi', { priority: 'foobar' })
+            res.end()
+          })
+
+          request(app)
           .get('/')
           .expect(500, /option priority is invalid/, done)
+
+
+        })
       })
     })
 
     describe('signed', function(){
-      it('should generate a signed JSON cookie', function(done){
-        var app = express();
+      it('should generate a signed JSON cookie', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(cookieParser('foo bar baz'));
+          var app = express();
 
-        app.use(function(req, res){
-          res.cookie('user', { name: 'tobi' }, { signed: true }).end();
-        });
+          app.use(cookieParser('foo bar baz'));
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('user', { name: 'tobi' }, { signed: true }).end();
+          });
+
+          request(app)
           .get('/')
           .expect('Set-Cookie', 'user=s%3Aj%3A%7B%22name%22%3A%22tobi%22%7D.K20xcwmDS%2BPb1rsD95o5Jm5SqWs1KteqdnynnB7jkTE; Path=/')
           .expect(200, done)
+
+
+        })
       })
     })
 
     describe('signed without secret', function(){
-      it('should throw an error', function(done){
-        var app = express();
+      it('should throw an error', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(cookieParser());
+          var app = express();
 
-        app.use(function(req, res){
-          res.cookie('name', 'tobi', { signed: true }).end();
-        });
+          app.use(cookieParser());
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('name', 'tobi', { signed: true }).end();
+          });
+
+          request(app)
         .get('/')
         .expect(500, /secret\S+ required for signed cookies/, done);
+
+
+        })
       })
     })
 
     describe('.signedCookie(name, string)', function(){
-      it('should set a signed cookie', function(done){
-        var app = express();
+      it('should set a signed cookie', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(cookieParser('foo bar baz'));
+          var app = express();
 
-        app.use(function(req, res){
-          res.cookie('name', 'tobi', { signed: true }).end();
-        });
+          app.use(cookieParser('foo bar baz'));
 
-        request(app)
+          app.use(function(req, res){
+            res.cookie('name', 'tobi', { signed: true }).end();
+          });
+
+          request(app)
         .get('/')
         .expect('Set-Cookie', 'name=s%3Atobi.xJjV2iZ6EI7C8E5kzwbfA9PVLl1ZR07UTnuTgQQ4EnQ; Path=/')
         .expect(200, done)
+
+
+        })
       })
     })
   })

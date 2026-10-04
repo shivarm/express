@@ -1,5 +1,7 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var assert = require('node:assert')
 var express = require('../');
 var request = require('supertest');
@@ -54,29 +56,53 @@ describe('exports', function(){
     assert.strictEqual(express().foo(), 'bar')
   })
 
-  it('should permit modifying the .request prototype', function(done){
-    express.request.foo = function(){ return 'bar'; };
-    var app = express();
+  it('should permit modifying the .request prototype', function (t) {
+    return new Promise(function (resolve, reject) {
+      var done = function (err) {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve()
+      }
 
-    app.use(function(req, res, next){
-      res.end(req.foo());
-    });
+      express.request.foo = function(){ return 'bar'; };
+      var app = express();
 
-    request(app)
+      app.use(function(req, res, next){
+        res.end(req.foo());
+      });
+
+      request(app)
     .get('/')
     .expect('bar', done);
+
+
+    })
   })
 
-  it('should permit modifying the .response prototype', function(done){
-    express.response.foo = function(){ this.send('bar'); };
-    var app = express();
+  it('should permit modifying the .response prototype', function (t) {
+    return new Promise(function (resolve, reject) {
+      var done = function (err) {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve()
+      }
 
-    app.use(function(req, res, next){
-      res.foo();
-    });
+      express.response.foo = function(){ this.send('bar'); };
+      var app = express();
 
-    request(app)
+      app.use(function(req, res, next){
+        res.foo();
+      });
+
+      request(app)
     .get('/')
     .expect('bar', done);
+
+
+    })
   })
 })

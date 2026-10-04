@@ -1,26 +1,37 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest')
   , cookieParser = require('cookie-parser')
 
 describe('req', function(){
   describe('.signedCookies', function(){
-    it('should return a signed JSON cookie', function(done){
-      var app = express();
-
-      app.use(cookieParser('secret'));
-
-      app.use(function(req, res){
-        if (req.path === '/set') {
-          res.cookie('obj', { foo: 'bar' }, { signed: true });
-          res.end();
-        } else {
-          res.send(req.signedCookies);
+    it('should return a signed JSON cookie', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
         }
-      });
 
-      request(app)
+        var app = express();
+
+        app.use(cookieParser('secret'));
+
+        app.use(function(req, res){
+          if (req.path === '/set') {
+            res.cookie('obj', { foo: 'bar' }, { signed: true });
+            res.end();
+          } else {
+            res.send(req.signedCookies);
+          }
+        });
+
+        request(app)
       .get('/set')
       .end(function(err, res){
         if (err) return done(err);
@@ -31,6 +42,9 @@ describe('req', function(){
         .set('Cookie', cookie)
         .expect(200, { obj: { foo: 'bar' } }, done)
       });
+
+
+      })
     })
   })
 })

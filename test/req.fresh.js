@@ -1,107 +1,181 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest');
 var shouldSkipQuery = require('./support/utils').shouldSkipQuery
 
 describe('req', function(){
   describe('.fresh', function(){
-    it('should return true when the resource is not modified', function(done){
-      var app = express();
-      var etag = '"12345"';
+    it('should return true when the resource is not modified', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.set('ETag', etag);
-        res.send(req.fresh);
-      });
+        var app = express();
+        var etag = '"12345"';
 
-      request(app)
+        app.use(function(req, res){
+          res.set('ETag', etag);
+          res.send(req.fresh);
+        });
+
+        request(app)
       .get('/')
       .set('If-None-Match', etag)
       .expect(304, done);
+
+
+      })
     })
 
-    it('should return false when the resource is modified', function(done){
-      var app = express();
+    it('should return false when the resource is modified', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.set('ETag', '"123"');
-        res.send(req.fresh);
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.set('ETag', '"123"');
+          res.send(req.fresh);
+        });
+
+        request(app)
       .get('/')
       .set('If-None-Match', '"12345"')
       .expect(200, 'false', done);
+
+
+      })
     })
 
-    it('should return false without response headers', function(done){
-      var app = express();
+    it('should return false without response headers', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.disable('x-powered-by')
-      app.use(function(req, res){
-        res.send(req.fresh);
-      });
+        var app = express();
 
-      request(app)
+        app.disable('x-powered-by')
+        app.use(function(req, res){
+          res.send(req.fresh);
+        });
+
+        request(app)
       .get('/')
       .expect(200, 'false', done);
+
+
+      })
     })
 
-    it('should return true for a QUERY request with a body when the resource is not modified', function(done){
-      if (shouldSkipQuery(process.versions.node)) {
-        this.skip()
-      }
-      var app = express();
-      var etag = '"12345"';
+    it('should return true for a QUERY request with a body when the resource is not modified', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.set('ETag', etag);
-        res.send(req.fresh);
-      });
+        if (shouldSkipQuery(process.versions.node)) {
+          t.skip()
+        }
+        var app = express();
+        var etag = '"12345"';
 
-      request(app)
+        app.use(function(req, res){
+          res.set('ETag', etag);
+          res.send(req.fresh);
+        });
+
+        request(app)
       .query('/')
       .set('If-None-Match', etag)
       .send({ ids: ['a', 'b'] })
       .expect(304, done);
+
+
+      })
     })
 
-    it('should return false for a QUERY request with a body when the resource is modified', function(done){
-      if (shouldSkipQuery(process.versions.node)) {
-        this.skip()
-      }
-      var app = express();
+    it('should return false for a QUERY request with a body when the resource is modified', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.set('ETag', '"123"');
-        res.send(req.fresh);
-      });
+        if (shouldSkipQuery(process.versions.node)) {
+          t.skip()
+        }
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.set('ETag', '"123"');
+          res.send(req.fresh);
+        });
+
+        request(app)
       .query('/')
       .set('If-None-Match', '"12345"')
       .send({ ids: ['a', 'b'] })
       .expect(200, 'false', done);
+
+
+      })
     })
 
-    it('should ignore "If-Modified-Since" when "If-None-Match" is present', function(done) {
-      var app = express();
-      const etag = '"FooBar"'
-      const now = Date.now()
+    it('should ignore "If-Modified-Since" when "If-None-Match" is present', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.disable('x-powered-by')
-      app.use(function(req, res) {
-        res.set('Etag', etag)
-        res.set('Last-Modified', new Date(now).toUTCString())
-        res.send(req.fresh);
-      });
+        var app = express();
+        const etag = '"FooBar"'
+        const now = Date.now()
 
-      request(app)
+        app.disable('x-powered-by')
+        app.use(function(req, res) {
+          res.set('Etag', etag)
+          res.set('Last-Modified', new Date(now).toUTCString())
+          res.send(req.fresh);
+        });
+
+        request(app)
         .get('/')
         .set('If-Modified-Since', new Date(now - 1000).toUTCString)
         .set('If-None-Match', etag)
         .expect(304, done);
+
+
+      })
     })
 
   })

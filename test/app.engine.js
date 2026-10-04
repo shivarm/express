@@ -1,5 +1,7 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var assert = require('node:assert')
 var express = require('../')
   , fs = require('node:fs');
@@ -15,17 +17,29 @@ function render(path, options, fn) {
 
 describe('app', function(){
   describe('.engine(ext, fn)', function(){
-    it('should map a template engine', function(done){
-      var app = express();
+    it('should map a template engine', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.set('views', path.join(__dirname, 'fixtures'))
-      app.engine('.html', render);
-      app.locals.user = { name: 'tobi' };
+        var app = express();
 
-      app.render('user.html', function(err, str){
-        if (err) return done(err);
-        assert.strictEqual(str, '<p>tobi</p>')
-        done();
+        app.set('views', path.join(__dirname, 'fixtures'))
+        app.engine('.html', render);
+        app.locals.user = { name: 'tobi' };
+
+        app.render('user.html', function(err, str){
+          if (err) return done(err);
+          assert.strictEqual(str, '<p>tobi</p>')
+          done();
+        })
+
+
       })
     })
 
@@ -36,47 +50,83 @@ describe('app', function(){
       }, /callback function required/)
     })
 
-    it('should work without leading "."', function(done){
-      var app = express();
+    it('should work without leading "."', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.set('views', path.join(__dirname, 'fixtures'))
-      app.engine('html', render);
-      app.locals.user = { name: 'tobi' };
+        var app = express();
 
-      app.render('user.html', function(err, str){
-        if (err) return done(err);
-        assert.strictEqual(str, '<p>tobi</p>')
-        done();
+        app.set('views', path.join(__dirname, 'fixtures'))
+        app.engine('html', render);
+        app.locals.user = { name: 'tobi' };
+
+        app.render('user.html', function(err, str){
+          if (err) return done(err);
+          assert.strictEqual(str, '<p>tobi</p>')
+          done();
+        })
+
+
       })
     })
 
-    it('should work "view engine" setting', function(done){
-      var app = express();
+    it('should work "view engine" setting', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.set('views', path.join(__dirname, 'fixtures'))
-      app.engine('html', render);
-      app.set('view engine', 'html');
-      app.locals.user = { name: 'tobi' };
+        var app = express();
 
-      app.render('user', function(err, str){
-        if (err) return done(err);
-        assert.strictEqual(str, '<p>tobi</p>')
-        done();
+        app.set('views', path.join(__dirname, 'fixtures'))
+        app.engine('html', render);
+        app.set('view engine', 'html');
+        app.locals.user = { name: 'tobi' };
+
+        app.render('user', function(err, str){
+          if (err) return done(err);
+          assert.strictEqual(str, '<p>tobi</p>')
+          done();
+        })
+
+
       })
     })
 
-    it('should work "view engine" with leading "."', function(done){
-      var app = express();
+    it('should work "view engine" with leading "."', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.set('views', path.join(__dirname, 'fixtures'))
-      app.engine('.html', render);
-      app.set('view engine', '.html');
-      app.locals.user = { name: 'tobi' };
+        var app = express();
 
-      app.render('user', function(err, str){
-        if (err) return done(err);
-        assert.strictEqual(str, '<p>tobi</p>')
-        done();
+        app.set('views', path.join(__dirname, 'fixtures'))
+        app.engine('.html', render);
+        app.set('view engine', '.html');
+        app.locals.user = { name: 'tobi' };
+
+        app.render('user', function(err, str){
+          if (err) return done(err);
+          assert.strictEqual(str, '<p>tobi</p>')
+          done();
+        })
+
+
       })
     })
   })

@@ -1,5 +1,7 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var assert = require('node:assert');
 var express = require('..');
 

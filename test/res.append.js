@@ -1,105 +1,167 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var assert = require('node:assert')
 var express = require('..')
 var request = require('supertest')
 
 describe('res', function () {
   describe('.append(field, val)', function () {
-    it('should append multiple headers', function (done) {
-      var app = express()
+    it('should append multiple headers', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res, next) {
-        res.append('Set-Cookie', 'foo=bar')
-        next()
-      })
+        var app = express()
 
-      app.use(function (req, res) {
-        res.append('Set-Cookie', 'fizz=buzz')
-        res.end()
-      })
+        app.use(function (req, res, next) {
+          res.append('Set-Cookie', 'foo=bar')
+          next()
+        })
 
-      request(app)
+        app.use(function (req, res) {
+          res.append('Set-Cookie', 'fizz=buzz')
+          res.end()
+        })
+
+        request(app)
         .get('/')
         .expect(200)
         .expect(shouldHaveHeaderValues('Set-Cookie', ['foo=bar', 'fizz=buzz']))
         .end(done)
+
+
+      })
     })
 
-    it('should accept array of values', function (done) {
-      var app = express()
+    it('should accept array of values', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res, next) {
-        res.append('Set-Cookie', ['foo=bar', 'fizz=buzz'])
-        res.end()
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res, next) {
+          res.append('Set-Cookie', ['foo=bar', 'fizz=buzz'])
+          res.end()
+        })
+
+        request(app)
         .get('/')
         .expect(200)
         .expect(shouldHaveHeaderValues('Set-Cookie', ['foo=bar', 'fizz=buzz']))
         .end(done)
+
+
+      })
     })
 
-    it('should get reset by res.set(field, val)', function (done) {
-      var app = express()
+    it('should get reset by res.set(field, val)', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res, next) {
-        res.append('Set-Cookie', 'foo=bar')
-        res.append('Set-Cookie', 'fizz=buzz')
-        next()
-      })
+        var app = express()
 
-      app.use(function (req, res) {
-        res.set('Set-Cookie', 'pet=tobi')
-        res.end()
-      });
+        app.use(function (req, res, next) {
+          res.append('Set-Cookie', 'foo=bar')
+          res.append('Set-Cookie', 'fizz=buzz')
+          next()
+        })
 
-      request(app)
+        app.use(function (req, res) {
+          res.set('Set-Cookie', 'pet=tobi')
+          res.end()
+        });
+
+        request(app)
         .get('/')
         .expect(200)
         .expect(shouldHaveHeaderValues('Set-Cookie', ['pet=tobi']))
         .end(done)
+
+
+      })
     })
 
-    it('should work with res.set(field, val) first', function (done) {
-      var app = express()
+    it('should work with res.set(field, val) first', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res, next) {
-        res.set('Set-Cookie', 'foo=bar')
-        next()
-      })
+        var app = express()
 
-      app.use(function(req, res){
-        res.append('Set-Cookie', 'fizz=buzz')
-        res.end()
-      })
+        app.use(function (req, res, next) {
+          res.set('Set-Cookie', 'foo=bar')
+          next()
+        })
 
-      request(app)
+        app.use(function(req, res){
+          res.append('Set-Cookie', 'fizz=buzz')
+          res.end()
+        })
+
+        request(app)
         .get('/')
         .expect(200)
         .expect(shouldHaveHeaderValues('Set-Cookie', ['foo=bar', 'fizz=buzz']))
         .end(done)
+
+
+      })
     })
 
-    it('should work together with res.cookie', function (done) {
-      var app = express()
+    it('should work together with res.cookie', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res, next) {
-        res.cookie('foo', 'bar')
-        next()
-      })
+        var app = express()
 
-      app.use(function (req, res) {
-        res.append('Set-Cookie', 'fizz=buzz')
-        res.end()
-      })
+        app.use(function (req, res, next) {
+          res.cookie('foo', 'bar')
+          next()
+        })
 
-      request(app)
+        app.use(function (req, res) {
+          res.append('Set-Cookie', 'fizz=buzz')
+          res.end()
+        })
+
+        request(app)
         .get('/')
         .expect(200)
         .expect(shouldHaveHeaderValues('Set-Cookie', ['foo=bar; Path=/', 'fizz=buzz']))
         .end(done)
+
+
+      })
     })
   })
 })

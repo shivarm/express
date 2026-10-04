@@ -72,7 +72,6 @@
     "hbs": "4.3.0",
     "marked": "^15.0.3",
     "method-override": "3.0.0",
-    "mocha": "^11.7.5",
     "morgan": "1.12.1",
     "nyc": "^17.1.0",
     "pbkdf2-password": "1.2.1",
@@ -91,9 +90,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "mocha --require test/support/env --reporter spec --check-leaks test/ test/acceptance/",
+    "test": "node --test --require ./test/support/env",
     "test-ci": "nyc --exclude examples --exclude test --exclude benchmarks --reporter=lcovonly --reporter=text npm test",
     "test-cov": "nyc --exclude examples --exclude test --exclude benchmarks --reporter=html --reporter=text npm test",
-    "test-tap": "mocha --require test/support/env --reporter tap --check-leaks test/ test/acceptance/"
+    "test-tap": "node --test --test-reporter=tap --require ./test/support/env"
   }
 }

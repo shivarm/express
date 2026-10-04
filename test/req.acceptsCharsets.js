@@ -1,62 +1,112 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest');
 
 describe('req', function(){
   describe('.acceptsCharsets(type)', function(){
     describe('when Accept-Charset is not present', function(){
-      it('should return true', function(done){
-        var app = express();
+      it('should return true', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res, next){
-          res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res, next){
+            res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
+          });
+
+          request(app)
         .get('/')
         .expect('yes', done);
+
+
+        })
       })
     })
 
     describe('when Accept-Charset is present', function () {
-      it('should return true', function (done) {
-        var app = express();
+      it('should return true', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res, next){
-          res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res, next){
+            res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
+          });
+
+          request(app)
         .get('/')
         .set('Accept-Charset', 'foo, bar, utf-8')
         .expect('yes', done);
+
+
+        })
       })
 
-      it('should return false otherwise', function(done){
-        var app = express();
+      it('should return false otherwise', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res, next){
-          res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res, next){
+            res.end(req.acceptsCharsets('utf-8') ? 'yes' : 'no');
+          });
+
+          request(app)
         .get('/')
         .set('Accept-Charset', 'foo, bar')
         .expect('no', done);
+
+
+        })
       })
 
-      it('should return the best matching charset from multiple inputs', function (done) {
-        var app = express();
+      it('should return the best matching charset from multiple inputs', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res, next){
-          res.end(req.acceptsCharsets('utf-8', 'iso-8859-1'));
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res, next){
+            res.end(req.acceptsCharsets('utf-8', 'iso-8859-1'));
+          });
+
+          request(app)
         .get('/')
         .set('Accept-Charset', 'iso-8859-1, utf-8')
         .expect('iso-8859-1', done);
+
+
+        })
       })
     })
   })

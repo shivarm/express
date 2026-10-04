@@ -1,62 +1,112 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest');
 
 describe('res', function(){
   describe('.clearCookie(name)', function(){
-    it('should set a cookie passed expiry', function(done){
-      var app = express();
+    it('should set a cookie passed expiry', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.clearCookie('sid').end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.clearCookie('sid').end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
       .expect(200, done)
+
+
+      })
     })
   })
 
   describe('.clearCookie(name, options)', function(){
-    it('should set the given params', function(done){
-      var app = express();
+    it('should set the given params', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.clearCookie('sid', { path: '/admin' }).end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.clearCookie('sid', { path: '/admin' }).end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'sid=; Path=/admin; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should ignore maxAge', function(done){
-      var app = express();
+    it('should ignore maxAge', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.clearCookie('sid', { path: '/admin', maxAge: 1000 }).end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.clearCookie('sid', { path: '/admin', maxAge: 1000 }).end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'sid=; Path=/admin; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should ignore user supplied expires param', function(done){
-      var app = express();
+    it('should ignore user supplied expires param', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.clearCookie('sid', { path: '/admin', expires: new Date() }).end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.clearCookie('sid', { path: '/admin', expires: new Date() }).end();
+        });
+
+        request(app)
       .get('/')
       .expect('Set-Cookie', 'sid=; Path=/admin; Expires=Thu, 01 Jan 1970 00:00:00 GMT')
       .expect(200, done)
+
+
+      })
     })
   })
 })

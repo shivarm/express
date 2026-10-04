@@ -1,31 +1,42 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest');
 
 describe('app', function(){
   describe('.param(names, fn)', function(){
-    it('should map the array', function(done){
-      var app = express();
+    it('should map the array', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param(['id', 'uid'], function(req, res, next, id){
-        id = Number(id);
-        if (isNaN(id)) return next('route');
-        req.params.id = id;
-        next();
-      });
+        var app = express();
 
-      app.get('/post/:id', function(req, res){
-        var id = req.params.id;
-        res.send((typeof id) + ':' + id)
-      });
+        app.param(['id', 'uid'], function(req, res, next, id){
+          id = Number(id);
+          if (isNaN(id)) return next('route');
+          req.params.id = id;
+          next();
+        });
 
-      app.get('/user/:uid', function(req, res){
-        var id = req.params.id;
-        res.send((typeof id) + ':' + id)
-      });
+        app.get('/post/:id', function(req, res){
+          var id = req.params.id;
+          res.send((typeof id) + ':' + id)
+        });
 
-      request(app)
+        app.get('/user/:uid', function(req, res){
+          var id = req.params.id;
+          res.send((typeof id) + ':' + id)
+        });
+
+        request(app)
         .get('/user/123')
         .expect(200, 'number:123', function (err) {
           if (err) return done(err)
@@ -33,291 +44,438 @@ describe('app', function(){
             .get('/post/123')
             .expect('number:123', done)
         })
+
+
+      })
     })
   })
 
   describe('.param(name, fn)', function(){
-    it('should map logic for a single param', function(done){
-      var app = express();
+    it('should map logic for a single param', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('id', function(req, res, next, id){
-        id = Number(id);
-        if (isNaN(id)) return next('route');
-        req.params.id = id;
-        next();
-      });
+        var app = express();
 
-      app.get('/user/:id', function(req, res){
-        var id = req.params.id;
-        res.send((typeof id) + ':' + id)
-      });
+        app.param('id', function(req, res, next, id){
+          id = Number(id);
+          if (isNaN(id)) return next('route');
+          req.params.id = id;
+          next();
+        });
 
-      request(app)
+        app.get('/user/:id', function(req, res){
+          var id = req.params.id;
+          res.send((typeof id) + ':' + id)
+        });
+
+        request(app)
         .get('/user/123')
         .expect(200, 'number:123', done)
+
+
+      })
     })
 
-    it('should only call once per request', function(done) {
-      var app = express();
-      var called = 0;
-      var count = 0;
+    it('should only call once per request', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('user', function(req, res, next, user) {
-        called++;
-        req.user = user;
-        next();
-      });
+        var app = express();
+        var called = 0;
+        var count = 0;
 
-      app.get('/foo/:user', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.get('/foo/:user', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.use(function(req, res) {
-        res.end([count, called, req.user].join(' '));
-      });
+        app.param('user', function(req, res, next, user) {
+          called++;
+          req.user = user;
+          next();
+        });
 
-      request(app)
+        app.get('/foo/:user', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.get('/foo/:user', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.use(function(req, res) {
+          res.end([count, called, req.user].join(' '));
+        });
+
+        request(app)
       .get('/foo/bob')
       .expect('2 1 bob', done);
+
+
+      })
     })
 
-    it('should call when values differ', function(done) {
-      var app = express();
-      var called = 0;
-      var count = 0;
+    it('should call when values differ', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('user', function(req, res, next, user) {
-        called++;
-        req.users = (req.users || []).concat(user);
-        next();
-      });
+        var app = express();
+        var called = 0;
+        var count = 0;
 
-      app.get('/:user/bob', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.get('/foo/:user', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.use(function(req, res) {
-        res.end([count, called, req.users.join(',')].join(' '));
-      });
+        app.param('user', function(req, res, next, user) {
+          called++;
+          req.users = (req.users || []).concat(user);
+          next();
+        });
 
-      request(app)
+        app.get('/:user/bob', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.get('/foo/:user', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.use(function(req, res) {
+          res.end([count, called, req.users.join(',')].join(' '));
+        });
+
+        request(app)
       .get('/foo/bob')
       .expect('2 2 foo,bob', done);
+
+
+      })
     })
 
-    it('should support altering req.params across routes', function(done) {
-      var app = express();
+    it('should support altering req.params across routes', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('user', function(req, res, next, user) {
-        req.params.user = 'loki';
-        next();
-      });
+        var app = express();
 
-      app.get('/:user', function(req, res, next) {
-        next('route');
-      });
-      app.get('/:user', function (req, res) {
-        res.send(req.params.user);
-      });
+        app.param('user', function(req, res, next, user) {
+          req.params.user = 'loki';
+          next();
+        });
 
-      request(app)
+        app.get('/:user', function(req, res, next) {
+          next('route');
+        });
+        app.get('/:user', function (req, res) {
+          res.send(req.params.user);
+        });
+
+        request(app)
       .get('/bob')
       .expect('loki', done);
+
+
+      })
     })
 
-    it('should not invoke without route handler', function(done) {
-      var app = express();
+    it('should not invoke without route handler', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('thing', function(req, res, next, thing) {
-        req.thing = thing;
-        next();
-      });
+        var app = express();
 
-      app.param('user', function(req, res, next, user) {
-        next(new Error('invalid invocation'))
-      });
+        app.param('thing', function(req, res, next, thing) {
+          req.thing = thing;
+          next();
+        });
 
-      app.post('/:user', function (req, res) {
-        res.send(req.params.user);
-      });
+        app.param('user', function(req, res, next, user) {
+          next(new Error('invalid invocation'))
+        });
 
-      app.get('/:thing', function (req, res) {
-        res.send(req.thing);
-      });
+        app.post('/:user', function (req, res) {
+          res.send(req.params.user);
+        });
 
-      request(app)
+        app.get('/:thing', function (req, res) {
+          res.send(req.thing);
+        });
+
+        request(app)
       .get('/bob')
       .expect(200, 'bob', done);
+
+
+      })
     })
 
-    it('should work with encoded values', function(done){
-      var app = express();
+    it('should work with encoded values', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('name', function(req, res, next, name){
-        req.params.name = name;
-        next();
-      });
+        var app = express();
 
-      app.get('/user/:name', function(req, res){
-        var name = req.params.name;
-        res.send('' + name);
-      });
+        app.param('name', function(req, res, next, name){
+          req.params.name = name;
+          next();
+        });
 
-      request(app)
+        app.get('/user/:name', function(req, res){
+          var name = req.params.name;
+          res.send('' + name);
+        });
+
+        request(app)
       .get('/user/foo%25bar')
       .expect('foo%bar', done);
+
+
+      })
     })
 
-    it('should catch thrown error', function(done){
-      var app = express();
+    it('should catch thrown error', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('id', function(req, res, next, id){
-        throw new Error('err!');
-      });
+        var app = express();
 
-      app.get('/user/:id', function(req, res){
-        var id = req.params.id;
-        res.send('' + id);
-      });
+        app.param('id', function(req, res, next, id){
+          throw new Error('err!');
+        });
 
-      request(app)
+        app.get('/user/:id', function(req, res){
+          var id = req.params.id;
+          res.send('' + id);
+        });
+
+        request(app)
       .get('/user/123')
       .expect(500, done);
+
+
+      })
     })
 
-    it('should catch thrown secondary error', function(done){
-      var app = express();
+    it('should catch thrown secondary error', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('id', function(req, res, next, val){
-        process.nextTick(next);
-      });
+        var app = express();
 
-      app.param('id', function(req, res, next, id){
-        throw new Error('err!');
-      });
+        app.param('id', function(req, res, next, val){
+          process.nextTick(next);
+        });
 
-      app.get('/user/:id', function(req, res){
-        var id = req.params.id;
-        res.send('' + id);
-      });
+        app.param('id', function(req, res, next, id){
+          throw new Error('err!');
+        });
 
-      request(app)
+        app.get('/user/:id', function(req, res){
+          var id = req.params.id;
+          res.send('' + id);
+        });
+
+        request(app)
       .get('/user/123')
       .expect(500, done);
+
+
+      })
     })
 
-    it('should defer to next route', function(done){
-      var app = express();
+    it('should defer to next route', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('id', function(req, res, next, id){
-        next('route');
-      });
+        var app = express();
 
-      app.get('/user/:id', function(req, res){
-        var id = req.params.id;
-        res.send('' + id);
-      });
+        app.param('id', function(req, res, next, id){
+          next('route');
+        });
 
-      app.get('/:name/123', function(req, res){
-        res.send('name');
-      });
+        app.get('/user/:id', function(req, res){
+          var id = req.params.id;
+          res.send('' + id);
+        });
 
-      request(app)
+        app.get('/:name/123', function(req, res){
+          res.send('name');
+        });
+
+        request(app)
       .get('/user/123')
       .expect('name', done);
+
+
+      })
     })
 
-    it('should defer all the param routes', function(done){
-      var app = express();
+    it('should defer all the param routes', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('id', function(req, res, next, val){
-        if (val === 'new') return next('route');
-        return next();
-      });
+        var app = express();
 
-      app.all('/user/:id', function(req, res){
-        res.send('all.id');
-      });
+        app.param('id', function(req, res, next, val){
+          if (val === 'new') return next('route');
+          return next();
+        });
 
-      app.get('/user/:id', function(req, res){
-        res.send('get.id');
-      });
+        app.all('/user/:id', function(req, res){
+          res.send('all.id');
+        });
 
-      app.get('/user/new', function(req, res){
-        res.send('get.new');
-      });
+        app.get('/user/:id', function(req, res){
+          res.send('get.id');
+        });
 
-      request(app)
+        app.get('/user/new', function(req, res){
+          res.send('get.new');
+        });
+
+        request(app)
       .get('/user/new')
       .expect('get.new', done);
+
+
+      })
     })
 
-    it('should not call when values differ on error', function(done) {
-      var app = express();
-      var called = 0;
-      var count = 0;
+    it('should not call when values differ on error', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('user', function(req, res, next, user) {
-        called++;
-        if (user === 'foo') throw new Error('err!');
-        req.user = user;
-        next();
-      });
+        var app = express();
+        var called = 0;
+        var count = 0;
 
-      app.get('/:user/bob', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.get('/foo/:user', function(req, res, next) {
-        count++;
-        next();
-      });
+        app.param('user', function(req, res, next, user) {
+          called++;
+          if (user === 'foo') throw new Error('err!');
+          req.user = user;
+          next();
+        });
 
-      app.use(function(err, req, res, next) {
-        res.status(500);
-        res.send([count, called, err.message].join(' '));
-      });
+        app.get('/:user/bob', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.get('/foo/:user', function(req, res, next) {
+          count++;
+          next();
+        });
 
-      request(app)
+        app.use(function(err, req, res, next) {
+          res.status(500);
+          res.send([count, called, err.message].join(' '));
+        });
+
+        request(app)
       .get('/foo/bob')
       .expect(500, '0 1 err!', done)
+
+
+      })
     });
 
-    it('should call when values differ when using "next"', function(done) {
-      var app = express();
-      var called = 0;
-      var count = 0;
+    it('should call when values differ when using "next"', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.param('user', function(req, res, next, user) {
-        called++;
-        if (user === 'foo') return next('route');
-        req.user = user;
-        next();
-      });
+        var app = express();
+        var called = 0;
+        var count = 0;
 
-      app.get('/:user/bob', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.get('/foo/:user', function(req, res, next) {
-        count++;
-        next();
-      });
-      app.use(function(req, res) {
-        res.end([count, called, req.user].join(' '));
-      });
+        app.param('user', function(req, res, next, user) {
+          called++;
+          if (user === 'foo') return next('route');
+          req.user = user;
+          next();
+        });
 
-      request(app)
+        app.get('/:user/bob', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.get('/foo/:user', function(req, res, next) {
+          count++;
+          next();
+        });
+        app.use(function(req, res) {
+          res.end([count, called, req.user].join(' '));
+        });
+
+        request(app)
       .get('/foo/bob')
       .expect('1 2 bob', done);
+
+
+      })
     })
   })
 })

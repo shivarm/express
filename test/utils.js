@@ -1,5 +1,7 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var assert = require('node:assert');
 const { Buffer } = require('node:buffer');
 var utils = require('../lib/utils');

@@ -1,14 +1,30 @@
 'use strict'
 
+var { describe, it, before, after } = require('node:test')
+
+var previousNodeEnv
+
 var assert = require('node:assert')
 var express = require('..')
 var request = require('supertest')
 
 describe('app', function(){
-  it('should inherit from event emitter', function(done){
-    var app = express();
-    app.on('foo', done);
-    app.emit('foo');
+  it('should inherit from event emitter', function (t) {
+    return new Promise(function (resolve, reject) {
+      var done = function (err) {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve()
+      }
+
+      var app = express();
+      app.on('foo', done);
+      app.emit('foo');
+
+
+    })
   })
 
   it('should be callable', function(){
@@ -16,10 +32,22 @@ describe('app', function(){
     assert.equal(typeof app, 'function');
   })
 
-  it('should 404 without routes', function(done){
-    request(express())
+  it('should 404 without routes', function (t) {
+    return new Promise(function (resolve, reject) {
+      var done = function (err) {
+        if (err) {
+          reject(err)
+          return
+        }
+        resolve()
+      }
+
+      request(express())
     .get('/')
     .expect(404, done);
+
+
+    })
   })
 })
 
@@ -73,12 +101,12 @@ describe('app.path()', function(){
 
 describe('in development', function(){
   before(function () {
-    this.env = process.env.NODE_ENV
+    previousNodeEnv = process.env.NODE_ENV
     process.env.NODE_ENV = 'development'
   })
 
   after(function () {
-    process.env.NODE_ENV = this.env
+    process.env.NODE_ENV = previousNodeEnv
   })
 
   it('should disable "view cache"', function(){
@@ -89,12 +117,12 @@ describe('in development', function(){
 
 describe('in production', function(){
   before(function () {
-    this.env = process.env.NODE_ENV
+    previousNodeEnv = process.env.NODE_ENV
     process.env.NODE_ENV = 'production'
   })
 
   after(function () {
-    process.env.NODE_ENV = this.env
+    process.env.NODE_ENV = previousNodeEnv
   })
 
   it('should enable "view cache"', function(){
@@ -105,12 +133,12 @@ describe('in production', function(){
 
 describe('without NODE_ENV', function(){
   before(function () {
-    this.env = process.env.NODE_ENV
+    previousNodeEnv = process.env.NODE_ENV
     process.env.NODE_ENV = ''
   })
 
   after(function () {
-    process.env.NODE_ENV = this.env
+    process.env.NODE_ENV = previousNodeEnv
   })
 
   it('should default to development', function(){

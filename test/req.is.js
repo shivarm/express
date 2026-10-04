@@ -1,169 +1,303 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('..')
 var request = require('supertest')
 
 describe('req.is()', function () {
   describe('when given a mime type', function () {
-    it('should return the type when matching', function (done) {
-      var app = express()
+    it('should return the type when matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('application/json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('application/json'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
 
-    it('should return false when not matching', function (done) {
-      var app = express()
+    it('should return false when not matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('image/jpeg'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('image/jpeg'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, 'false', done)
+
+
+      })
     })
 
-    it('should ignore charset', function (done) {
-      var app = express()
+    it('should ignore charset', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('application/json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('application/json'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json; charset=UTF-8')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
   })
 
   describe('when content-type is not present', function(){
-    it('should return false', function (done) {
-      var app = express()
+    it('should return false', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('application/json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('application/json'))
+        })
+
+        request(app)
       .post('/')
       .send('{}')
       .expect(200, 'false', done)
+
+
+      })
     })
   })
 
   describe('when given an extension', function(){
-    it('should lookup the mime type', function (done) {
-      var app = express()
+    it('should lookup the mime type', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('json'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, '"json"', done)
+
+
+      })
     })
   })
 
   describe('when given */subtype', function(){
-    it('should return the full type when matching', function (done) {
-      var app = express()
+    it('should return the full type when matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('*/json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('*/json'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
 
-    it('should return false when not matching', function (done) {
-      var app = express()
+    it('should return false when not matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('*/html'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('*/html'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, 'false', done)
+
+
+      })
     })
 
-    it('should ignore charset', function (done) {
-      var app = express()
+    it('should ignore charset', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('*/json'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('*/json'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json; charset=UTF-8')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
   })
 
   describe('when given type/*', function(){
-    it('should return the full type when matching', function (done) {
-      var app = express()
+    it('should return the full type when matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('application/*'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('application/*'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
 
-    it('should return false when not matching', function (done) {
-      var app = express()
+    it('should return false when not matching', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('text/*'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('text/*'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json')
       .send('{}')
       .expect(200, 'false', done)
+
+
+      })
     })
 
-    it('should ignore charset', function (done) {
-      var app = express()
+    it('should ignore charset', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.json(req.is('application/*'))
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.json(req.is('application/*'))
+        })
+
+        request(app)
       .post('/')
       .type('application/json; charset=UTF-8')
       .send('{}')
       .expect(200, '"application/json"', done)
+
+
+      })
     })
   })
 })

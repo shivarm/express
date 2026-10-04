@@ -1,105 +1,191 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest')
   , assert = require('node:assert');
 
 describe('res', function(){
   describe('.json(object)', function(){
-    it('should not support jsonp callbacks', function(done){
-      var app = express();
+    it('should not support jsonp callbacks', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.json({ foo: 'bar' });
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.json({ foo: 'bar' });
+        });
+
+        request(app)
       .get('/?callback=foo')
       .expect('{"foo":"bar"}', done);
+
+
+      })
     })
 
-    it('should not override previous Content-Types', function(done){
-      var app = express();
+    it('should not override previous Content-Types', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.get('/', function(req, res){
-        res.type('application/vnd.example+json');
-        res.json({ hello: 'world' });
-      });
+        var app = express();
 
-      request(app)
+        app.get('/', function(req, res){
+          res.type('application/vnd.example+json');
+          res.json({ hello: 'world' });
+        });
+
+        request(app)
       .get('/')
       .expect('Content-Type', 'application/vnd.example+json; charset=utf-8')
       .expect(200, '{"hello":"world"}', done);
+
+
+      })
     })
 
     describe('when given primitives', function(){
-      it('should respond with json for null', function(done){
-        var app = express();
+      it('should respond with json for null', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.json(null);
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.json(null);
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, 'null', done)
+
+
+        })
       })
 
-      it('should respond with json for Number', function(done){
-        var app = express();
+      it('should respond with json for Number', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.json(300);
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.json(300);
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '300', done)
+
+
+        })
       })
 
-      it('should respond with json for String', function(done){
-        var app = express();
+      it('should respond with json for String', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.json('str');
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.json('str');
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '"str"', done)
+
+
+        })
       })
     })
 
     describe('when given an array', function(){
-      it('should respond with json', function(done){
-        var app = express();
+      it('should respond with json', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.json(['foo', 'bar', 'baz']);
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.json(['foo', 'bar', 'baz']);
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '["foo","bar","baz"]', done)
+
+
+        })
       })
     })
 
     describe('when given an object', function(){
-      it('should respond with json', function(done){
-        var app = express();
+      it('should respond with json', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.json({ name: 'tobi' });
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.json({ name: 'tobi' });
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '{"name":"tobi"}', done)
+
+
+        })
       })
     })
 
@@ -109,55 +195,91 @@ describe('res', function(){
         assert.strictEqual(app.get('json escape'), undefined)
       })
 
-      it('should unicode escape HTML-sniffing characters', function (done) {
-        var app = express()
+      it('should unicode escape HTML-sniffing characters', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.enable('json escape')
+          var app = express()
 
-        app.use(function (req, res) {
-          res.json({ '&': '<script>' })
-        })
+          app.enable('json escape')
 
-        request(app)
+          app.use(function (req, res) {
+            res.json({ '&': '<script>' })
+          })
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '{"\\u0026":"\\u003cscript\\u003e"}', done)
+
+
+        })
       })
 
-      it('should not break undefined escape', function (done) {
-        var app = express()
+      it('should not break undefined escape', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.enable('json escape')
+          var app = express()
 
-        app.use(function (req, res) {
-          res.json(undefined)
-        })
+          app.enable('json escape')
 
-        request(app)
+          app.use(function (req, res) {
+            res.json(undefined)
+          })
+
+          request(app)
           .get('/')
           .expect('Content-Type', 'application/json; charset=utf-8')
           .expect(200, '', done)
+
+
+        })
       })
     })
 
     describe('"json replacer" setting', function(){
-      it('should be passed to JSON.stringify()', function(done){
-        var app = express();
+      it('should be passed to JSON.stringify()', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.set('json replacer', function(key, val){
-          return key[0] === '_'
-            ? undefined
-            : val;
-        });
+          var app = express();
 
-        app.use(function(req, res){
-          res.json({ name: 'tobi', _id: 12345 });
-        });
+          app.set('json replacer', function(key, val){
+            return key[0] === '_'
+              ? undefined
+              : val;
+          });
 
-        request(app)
+          app.use(function(req, res){
+            res.json({ name: 'tobi', _id: 12345 });
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '{"name":"tobi"}', done)
+
+
+        })
       })
     })
 
@@ -167,19 +289,31 @@ describe('res', function(){
         assert(undefined === app.get('json spaces'));
       })
 
-      it('should be passed to JSON.stringify()', function(done){
-        var app = express();
+      it('should be passed to JSON.stringify()', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.set('json spaces', 2);
+          var app = express();
 
-        app.use(function(req, res){
-          res.json({ name: 'tobi', age: 2 });
-        });
+          app.set('json spaces', 2);
 
-        request(app)
+          app.use(function(req, res){
+            res.json({ name: 'tobi', age: 2 });
+          });
+
+          request(app)
         .get('/')
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(200, '{\n  "name": "tobi",\n  "age": 2\n}', done)
+
+
+        })
       })
     })
   })

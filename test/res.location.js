@@ -1,5 +1,7 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest')
   , assert = require('node:assert')
@@ -7,118 +9,226 @@ var express = require('../')
 
 describe('res', function(){
   describe('.location(url)', function(){
-    it('should set the header', function(done){
-      var app = express();
+    it('should set the header', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.location('http://google.com/').end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.location('http://google.com/').end();
+        });
+
+        request(app)
       .get('/')
       .expect('Location', 'http://google.com/')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should preserve trailing slashes when not present', function(done){
-      var app = express();
+    it('should preserve trailing slashes when not present', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function(req, res){
-        res.location('http://google.com').end();
-      });
+        var app = express();
 
-      request(app)
+        app.use(function(req, res){
+          res.location('http://google.com').end();
+        });
+
+        request(app)
       .get('/')
       .expect('Location', 'http://google.com')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should encode "url"', function (done) {
-      var app = express()
+    it('should encode "url"', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.use(function (req, res) {
-        res.location('https://google.com?q=\u2603 §10').end()
-      })
+        var app = express()
 
-      request(app)
+        app.use(function (req, res) {
+          res.location('https://google.com?q=\u2603 §10').end()
+        })
+
+        request(app)
       .get('/')
       .expect('Location', 'https://google.com?q=%E2%98%83%20%C2%A710')
       .expect(200, done)
+
+
+      })
     })
 
-    it('should encode data uri', function (done) {
-      var app = express()
-      app.use(function (req, res) {
-        res.location('data:text/javascript,export default () => { }').end();
-      });
+    it('should encode data uri', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      request(app)
+        var app = express()
+        app.use(function (req, res) {
+          res.location('data:text/javascript,export default () => { }').end();
+        });
+
+        request(app)
         .get('/')
         .expect('Location', 'data:text/javascript,export%20default%20()%20=%3E%20%7B%20%7D')
         .expect(200, done)
+
+
+      })
     })
 
-    it('should consistently handle non-string input: boolean', function (done) {
-      var app = express()
-      app.use(function (req, res) {
-        res.location(true).end();
-      });
+    it('should consistently handle non-string input: boolean', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      request(app)
+        var app = express()
+        app.use(function (req, res) {
+          res.location(true).end();
+        });
+
+        request(app)
         .get('/')
         .expect('Location', 'true')
         .expect(200, done)
+
+
+      })
     });
 
-    it('should consistently handle non-string inputs: object', function (done) {
-      var app = express()
-      app.use(function (req, res) {
-        res.location({}).end();
-      });
+    it('should consistently handle non-string inputs: object', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      request(app)
+        var app = express()
+        app.use(function (req, res) {
+          res.location({}).end();
+        });
+
+        request(app)
         .get('/')
         .expect('Location', '[object%20Object]')
         .expect(200, done)
+
+
+      })
     });
 
-    it('should consistently handle non-string inputs: array', function (done) {
-      var app = express()
-      app.use(function (req, res) {
-        res.location([]).end();
-      });
+    it('should consistently handle non-string inputs: array', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      request(app)
+        var app = express()
+        app.use(function (req, res) {
+          res.location([]).end();
+        });
+
+        request(app)
         .get('/')
         .expect('Location', '')
         .expect(200, done)
+
+
+      })
     });
 
-    it('should consistently handle empty string input', function (done) {
-      var app = express()
-      app.use(function (req, res) {
-        res.location('').end();
-      });
+    it('should consistently handle empty string input', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      request(app)
+        var app = express()
+        app.use(function (req, res) {
+          res.location('').end();
+        });
+
+        request(app)
         .get('/')
         .expect('Location', '')
         .expect(200, done)
+
+
+      })
     });
 
 
     if (typeof URL !== 'undefined') {
-      it('should accept an instance of URL', function (done) {
-        var app = express();
+      it('should accept an instance of URL', function (t) {
+        return new Promise(function (resolve, reject) {
+          var done = function (err) {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve()
+          }
 
-        app.use(function(req, res){
-          res.location(new URL('http://google.com/')).end();
-        });
+          var app = express();
 
-        request(app)
+          app.use(function(req, res){
+            res.location(new URL('http://google.com/')).end();
+          });
+
+          request(app)
           .get('/')
           .expect('Location', 'http://google.com/')
           .expect(200, done);
+
+
+        })
       });
     }
   })
@@ -169,136 +279,280 @@ describe('res', function(){
         });
     }
 
-    it('should not touch already-encoded sequences in "url"', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'https://google.com?q=%A710',
-        'https://google.com?q=%A710',
-        'google.com',
-        done
-      );
+    it('should not touch already-encoded sequences in "url"', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'https://google.com?q=%A710',
+          'https://google.com?q=%A710',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should consistently handle relative urls', function (done) {
-      var app = createRedirectServerForDomain(null);
-      testRequestedRedirect(
-        app,
-        '/foo/bar',
-        '/foo/bar',
-        null,
-        done
-      );
+    it('should consistently handle relative urls', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain(null);
+        testRequestedRedirect(
+          app,
+          '/foo/bar',
+          '/foo/bar',
+          null,
+          done
+        );
+
+
+      })
     });
 
-    it('should not encode urls in such a way that they can bypass redirect allow lists', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'http://google.com\\@apple.com',
-        'http://google.com\\@apple.com',
-        'google.com',
-        done
-      );
+    it('should not encode urls in such a way that they can bypass redirect allow lists', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'http://google.com\\@apple.com',
+          'http://google.com\\@apple.com',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should not be case sensitive', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'HTTP://google.com\\@apple.com',
-        'HTTP://google.com\\@apple.com',
-        'google.com',
-        done
-      );
+    it('should not be case sensitive', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'HTTP://google.com\\@apple.com',
+          'HTTP://google.com\\@apple.com',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should work with https', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'https://google.com\\@apple.com',
-        'https://google.com\\@apple.com',
-        'google.com',
-        done
-      );
+    it('should work with https', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'https://google.com\\@apple.com',
+          'https://google.com\\@apple.com',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should correctly encode schemaless paths', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        '//google.com\\@apple.com/',
-        '//google.com\\@apple.com/',
-        'google.com',
-        done
-      );
+    it('should correctly encode schemaless paths', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          '//google.com\\@apple.com/',
+          '//google.com\\@apple.com/',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should keep backslashes in the path', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'https://google.com/foo\\bar\\baz',
-        'https://google.com/foo\\bar\\baz',
-        'google.com',
-        done
-      );
+    it('should keep backslashes in the path', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'https://google.com/foo\\bar\\baz',
+          'https://google.com/foo\\bar\\baz',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should escape header splitting for old node versions', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'http://google.com\\@apple.com/%0d%0afoo:%20bar',
-        'http://google.com\\@apple.com/%0d%0afoo:%20bar',
-        'google.com',
-        done
-      );
+    it('should escape header splitting for old node versions', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'http://google.com\\@apple.com/%0d%0afoo:%20bar',
+          'http://google.com\\@apple.com/%0d%0afoo:%20bar',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should encode unicode correctly', function (done) {
-      var app = createRedirectServerForDomain(null);
-      testRequestedRedirect(
-        app,
-        '/%e2%98%83',
-        '/%e2%98%83',
-        null,
-        done
-      );
+    it('should encode unicode correctly', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain(null);
+        testRequestedRedirect(
+          app,
+          '/%e2%98%83',
+          '/%e2%98%83',
+          null,
+          done
+        );
+
+
+      })
     });
 
-    it('should encode unicode correctly even with a bad host', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'http://google.com\\@apple.com/%e2%98%83',
-        'http://google.com\\@apple.com/%e2%98%83',
-        'google.com',
-        done
-      );
+    it('should encode unicode correctly even with a bad host', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'http://google.com\\@apple.com/%e2%98%83',
+          'http://google.com\\@apple.com/%e2%98%83',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should work correctly despite using deprecated url.parse', function (done) {
-      var app = createRedirectServerForDomain('google.com');
-      testRequestedRedirect(
-        app,
-        'https://google.com\'.bb.com/1.html',
-        'https://google.com\'.bb.com/1.html',
-        'google.com',
-        done
-      );
+    it('should work correctly despite using deprecated url.parse', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('google.com');
+        testRequestedRedirect(
+          app,
+          'https://google.com\'.bb.com/1.html',
+          'https://google.com\'.bb.com/1.html',
+          'google.com',
+          done
+        );
+
+
+      })
     });
 
-    it('should encode file uri path', function (done) {
-      var app = createRedirectServerForDomain('');
-      testRequestedRedirect(
-        app,
-        'file:///etc\\passwd',
-        'file:///etc\\passwd',
-        '',
-        done
-      );
+    it('should encode file uri path', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
+
+        var app = createRedirectServerForDomain('');
+        testRequestedRedirect(
+          app,
+          'file:///etc\\passwd',
+          'file:///etc\\passwd',
+          '',
+          done
+        );
+
+
+      })
     });
   });
 })

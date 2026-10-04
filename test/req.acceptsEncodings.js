@@ -1,39 +1,65 @@
 'use strict'
 
+var { describe, it } = require('node:test')
+
 var express = require('../')
   , request = require('supertest');
 
 describe('req', function(){
   describe('.acceptsEncodings', function () {
-    it('should return encoding if accepted', function (done) {
-      var app = express();
+    it('should return encoding if accepted', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.get('/', function (req, res) {
-        res.send({
-          gzip: req.acceptsEncodings('gzip'),
-          deflate: req.acceptsEncodings('deflate')
+        var app = express();
+
+        app.get('/', function (req, res) {
+          res.send({
+            gzip: req.acceptsEncodings('gzip'),
+            deflate: req.acceptsEncodings('deflate')
+          })
         })
-      })
 
-      request(app)
+        request(app)
         .get('/')
         .set('Accept-Encoding', ' gzip, deflate')
         .expect(200, { gzip: 'gzip', deflate: 'deflate' }, done)
+
+
+      })
     })
 
-    it('should be false if encoding not accepted', function(done){
-      var app = express();
+    it('should be false if encoding not accepted', function (t) {
+      return new Promise(function (resolve, reject) {
+        var done = function (err) {
+          if (err) {
+            reject(err)
+            return
+          }
+          resolve()
+        }
 
-      app.get('/', function (req, res) {
-        res.send({
-          bogus: req.acceptsEncodings('bogus')
+        var app = express();
+
+        app.get('/', function (req, res) {
+          res.send({
+            bogus: req.acceptsEncodings('bogus')
+          })
         })
-      })
 
-      request(app)
+        request(app)
         .get('/')
         .set('Accept-Encoding', ' gzip, deflate')
         .expect(200, { bogus: false }, done)
+
+
+      })
     })
   })
 })
